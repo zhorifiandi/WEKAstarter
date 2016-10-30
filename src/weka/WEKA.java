@@ -28,7 +28,7 @@ public class WEKA {
     public static void main(String[] args) throws Exception {
         // TODO code application logic here
         BufferedReader breader = null;
-        breader = new BufferedReader(new FileReader("C:\\Users\\user-ari\\Documents\\ITB\\IF\\ai\\WEKA\\src\\weka\\iris.arff"));
+        breader = new BufferedReader(new FileReader("src\\weka\\iris.arff"));
         
         Instances train = new Instances (breader);
         train.setClassIndex(train.numAttributes() -1);
