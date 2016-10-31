@@ -6,41 +6,128 @@
 package weka;
 
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.ObjectOutputStream;
 import java.util.Random;
+import java.util.Scanner;
+import weka.classifiers.Classifier;
 
 import weka.core.Instances;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
+import weka.filters.Filter;
+import weka.filters.supervised.attribute.*;
 
 /**
  *
  * @author user-ari
  */
 public class WEKA {
-
-
-    /**
-     * @param args the command line arguments
-     */
     
-       
+    void saveModel(Classifier C, String namaFile) throws Exception {
+        //SAVE 
+         // serialize model
+                ObjectOutputStream oos = new ObjectOutputStream(
+                                           new FileOutputStream(namaFile));
+                oos.writeObject(C);
+                oos.flush();
+                oos.close();
+    }
+
     public static void main(String[] args) throws Exception {
-        // TODO code application logic here
+        // IMPORT file *.arff
+        WEKA w = new WEKA();
         BufferedReader breader = null;
         breader = new BufferedReader(new FileReader("src\\weka\\iris.arff"));
         
-        Instances train = new Instances (breader);
-        train.setClassIndex(train.numAttributes() -1);
+        Instances inputTrain = new Instances (breader);
+        inputTrain.setClassIndex(inputTrain.numAttributes() -1);
         
         breader.close();
         
+    
+        //FILTER
+        Discretize filter = new Discretize();
+        filter.setInputFormat(inputTrain);
+        Instances outputTrain = Filter.useFilter(inputTrain,filter);
+        
+        //ALGORITMA YANG DIGUNAKAN
         NaiveBayes nB = new NaiveBayes();
-        nB.buildClassifier(train);
-        Evaluation eval = new Evaluation(train);
-        eval.crossValidateModel(nB, train, 10, new Random(1));
-        System.out.println(eval.toSummaryString("\nResults\n=======\n",true));
-        System.out.println(eval.fMeasure(1)+" "+eval.recall(1));
+        nB.buildClassifier(outputTrain);
+        
+        
+        Evaluation eval = new Evaluation(outputTrain);
+       
+        
+        //Pilihan SKEMA
+        boolean validasi = false;
+        do {
+            Scanner scan = new Scanner(System.in);
+            System.out.println("\n\n=================\n==== PILIHAN ====");
+            System.out.println("1. Skema Full Training");
+            System.out.println("2. Skema 10 Fold Validation");
+            System.out.println("3. Load");
+            System.out.println("4. Exit");
+            System.out.print("Masukkan pilihan anda (1/2/3/4) : ");
+            int pilihan = scan.nextInt();
+
+            if (pilihan == 1)
+            {
+                eval.evaluateModel(nB,outputTrain);
+                //OUTPUT
+                System.out.println(eval.toSummaryString("\nResults\n======================\n",true));
+                System.out.println(eval.fMeasure(1)+" "+eval.recall(1));
+                System.out.println("\nAre you want to save this model(1/0)? ");
+                int c = scan.nextInt();
+                if (c == 1 ){
+                    System.out.print("Please enter your file name (*.model) : ");
+                    String infile = scan.next();
+                    w.saveModel(nB,infile);
+                }
+                else {
+                    System.out.print("You're not saving it!");
+                }
+            }
+            else if (pilihan == 2)
+            {
+                eval.crossValidateModel(nB, outputTrain, 10, new Random(1));
+                //OUTPUT
+                System.out.println(eval.toSummaryString("\nResults\n======================\n",true));
+                System.out.println(eval.fMeasure(1)+" "+eval.recall(1));
+                System.out.println("\nAre you want to save this model(1/0)? ");
+                int c = scan.nextInt();
+                if (c == 1 ){
+                    System.out.print("Please enter your file name (*.model) : ");
+                    String infile = scan.next();
+                    w.saveModel(nB,infile);
+                }
+                else {
+                    System.out.print("You're not saving it!");
+                }
+            }
+            else if (pilihan == 3){
+                //LOAD
+                // deserialize model
+                System.out.print("Masukkan nama file : ");
+                String namaFile = scan.next();
+                Classifier cls = (Classifier) weka.core.SerializationHelper.read(namaFile);
+                eval.crossValidateModel(cls, outputTrain, 10, new Random(1));
+                System.out.println(eval.toSummaryString("\nResults\n======================\n",true));
+                System.out.println(eval.fMeasure(1)+" "+eval.recall(1));
+            }
+            else if (pilihan == 4) {
+                validasi = true;                
+            }
+            else{
+                System.out.println("Input salah!");
+            }
+        }
+        while (!validasi);
+        
+        
+        
+        
         
     }
     
