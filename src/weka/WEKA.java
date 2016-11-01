@@ -56,7 +56,6 @@ public class WEKA {
         
         //ALGORITMA YANG DIGUNAKAN
         NaiveBayes nB = new NaiveBayes();
-        nB.buildClassifier(outputTrain);
         
         
         Evaluation eval = new Evaluation(outputTrain);
@@ -78,6 +77,7 @@ public class WEKA {
             switch (pilihan) {
                 case 1:
                     {
+                        nB.buildClassifier(outputTrain);
                         eval.evaluateModel(nB,outputTrain);
                         //OUTPUT
                         System.out.println(eval.toSummaryString("\nResults\n======================\n",true));
@@ -95,6 +95,7 @@ public class WEKA {
                     }
                 case 2:
                     {
+                        nB.buildClassifier(outputTrain);
                         eval.crossValidateModel(nB, outputTrain, 10, new Random(1));
                         //OUTPUT
                         System.out.println(eval.toSummaryString("\nResults\n======================\n",true));
@@ -121,18 +122,23 @@ public class WEKA {
                     System.out.println(eval.fMeasure(1)+" "+eval.recall(1));
                     break;
                 case 4:
+                    //ADD New Instance
+                    nB.buildClassifier(inputTrain);
+                    //Copy attributes from instances
                     DenseInstance buffer = new DenseInstance(inputTrain.firstInstance());
+                    //Initialization
                     buffer.setDataset(inputTrain);
                     buffer.setMissing(inputTrain.classIndex());
+                    //Input
                     for (int i = 0; i < inputTrain.classIndex(); i++){
                         System.out.print("Enter the value for " + buffer.attribute(i).name() + ": ");
                         double val = scan.nextDouble();
                         buffer.setValue(i, val);
                     }
+                    //Classify
                     double res = nB.classifyInstance(buffer);
                     buffer.setValue(inputTrain.classIndex(), res);
                     inputTrain.add(buffer);
-                    System.out.println(inputTrain);
                     break;
                 case 5:
                     validasi = true;
