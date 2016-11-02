@@ -41,12 +41,7 @@ public class WEKA {
         // IMPORT file *.arff
         WEKA w = new WEKA();
         
-       
-        
-        //Pilihan SKEMA
-        boolean validasi = false;
-        do {
-            BufferedReader breader = null;
+       BufferedReader breader = null;
             breader = new BufferedReader(new FileReader("src\\weka\\iris.arff"));
 
             Instances inputTrain = new Instances (breader);
@@ -64,7 +59,12 @@ public class WEKA {
             NaiveBayes nB = new NaiveBayes();
 
 
-            Evaluation eval = new Evaluation(outputTrain);
+            
+        
+        //Pilihan SKEMA
+        boolean validasi = false;
+        do {
+            
             Scanner scan = new Scanner(System.in);
             System.out.println("\n\n=================\n==== OPTION ====");
             System.out.println("1. Full Training Scheme");
@@ -78,6 +78,7 @@ public class WEKA {
             switch (pilihan) {
                 case 1:
                     {
+                        Evaluation eval = new Evaluation(outputTrain);
                         nB.buildClassifier(outputTrain);
                         eval.evaluateModel(nB,outputTrain);
                         //OUTPUT
@@ -98,6 +99,7 @@ public class WEKA {
                     }
                 case 2:
                     {
+                        Evaluation eval = new Evaluation(outputTrain);
                         nB.buildClassifier(outputTrain);
                         eval.crossValidateModel(nB, outputTrain, 10, new Random(1));
                         //OUTPUT
@@ -119,6 +121,7 @@ public class WEKA {
                 case 3:
                     //LOAD
                     // deserialize model
+                    Evaluation eval = new Evaluation(outputTrain);
                     System.out.print("Please enter the file name : ");
                     String namaFile = scan.next();
                     Classifier cls = (Classifier) weka.core.SerializationHelper.read(namaFile);
@@ -130,6 +133,7 @@ public class WEKA {
                     break;
                 case 4:
                     //ADD New Instance
+                    
                     nB.buildClassifier(inputTrain);
                     //Copy attributes from instances
                     DenseInstance buffer = new DenseInstance(inputTrain.firstInstance());
