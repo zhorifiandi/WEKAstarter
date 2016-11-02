@@ -40,30 +40,31 @@ public class WEKA {
     public static void main(String[] args) throws Exception {
         // IMPORT file *.arff
         WEKA w = new WEKA();
-        BufferedReader breader = null;
-        breader = new BufferedReader(new FileReader("src\\weka\\iris.arff"));
         
-        Instances inputTrain = new Instances (breader);
-        inputTrain.setClassIndex(inputTrain.numAttributes() -1);
-        
-        breader.close();
-        
-    
-        //FILTER
-        Discretize filter = new Discretize();
-        filter.setInputFormat(inputTrain);
-        Instances outputTrain = Filter.useFilter(inputTrain,filter);
-        
-        //ALGORITMA YANG DIGUNAKAN
-        NaiveBayes nB = new NaiveBayes();
-        
-        
-        Evaluation eval = new Evaluation(outputTrain);
        
         
         //Pilihan SKEMA
         boolean validasi = false;
         do {
+            BufferedReader breader = null;
+            breader = new BufferedReader(new FileReader("src\\weka\\iris.arff"));
+
+            Instances inputTrain = new Instances (breader);
+            inputTrain.setClassIndex(inputTrain.numAttributes() -1);
+
+            breader.close();
+
+
+            //FILTER
+            Discretize filter = new Discretize();
+            filter.setInputFormat(inputTrain);
+            Instances outputTrain = Filter.useFilter(inputTrain,filter);
+
+            //ALGORITMA YANG DIGUNAKAN
+            NaiveBayes nB = new NaiveBayes();
+
+
+            Evaluation eval = new Evaluation(outputTrain);
             Scanner scan = new Scanner(System.in);
             System.out.println("\n\n=================\n==== OPTION ====");
             System.out.println("1. Full Training Scheme");
@@ -80,7 +81,9 @@ public class WEKA {
                         nB.buildClassifier(outputTrain);
                         eval.evaluateModel(nB,outputTrain);
                         //OUTPUT
-                        System.out.println(eval.toSummaryString("\nResults\n======================\n",true));
+                        System.out.println(eval.toSummaryString("=== Stratified cross-validation ===\n" +"=== Summary ===",true));
+                        System.out.println(eval.toClassDetailsString("=== Detailed Accuracy By Class ==="));
+                        System.out.println(eval.toMatrixString("===Confusion matrix==="));
                         System.out.println(eval.fMeasure(1)+" "+eval.recall(1));
                         System.out.println("\nDo you want to save this model(1/0)? ");
                         int c = scan.nextInt();
@@ -98,7 +101,9 @@ public class WEKA {
                         nB.buildClassifier(outputTrain);
                         eval.crossValidateModel(nB, outputTrain, 10, new Random(1));
                         //OUTPUT
-                        System.out.println(eval.toSummaryString("\nResults\n======================\n",true));
+                        System.out.println(eval.toSummaryString("=== Stratified cross-validation ===\n" +"=== Summary ===",true));
+                        System.out.println(eval.toClassDetailsString("=== Detailed Accuracy By Class ==="));
+                        System.out.println(eval.toMatrixString("===Confusion matrix==="));
                         System.out.println(eval.fMeasure(1)+" "+eval.recall(1));
                         System.out.println("\nDo you want to save this model(1/0)? ");
                         int c = scan.nextInt();
@@ -118,7 +123,9 @@ public class WEKA {
                     String namaFile = scan.next();
                     Classifier cls = (Classifier) weka.core.SerializationHelper.read(namaFile);
                     eval.crossValidateModel(cls, outputTrain, 10, new Random(1));
-                    System.out.println(eval.toSummaryString("\nResults\n======================\n",true));
+                    System.out.println(eval.toSummaryString("=== Stratified cross-validation ===\n" +"=== Summary ===",true));
+                    System.out.println(eval.toClassDetailsString("=== Detailed Accuracy By Class ==="));
+                    System.out.println(eval.toMatrixString("===Confusion matrix==="));
                     System.out.println(eval.fMeasure(1)+" "+eval.recall(1));
                     break;
                 case 4:
