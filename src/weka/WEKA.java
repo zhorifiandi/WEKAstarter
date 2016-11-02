@@ -139,6 +139,7 @@ public class WEKA {
                     double res = nB.classifyInstance(buffer);
                     buffer.setValue(inputTrain.classIndex(), res);
                     inputTrain.add(buffer);
+                    System.out.println(inputTrain.toSummaryString());
                     break;
                 case 5:
                     validasi = true;
